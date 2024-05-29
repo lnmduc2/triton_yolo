@@ -1,0 +1,5 @@
+ultralytics==8.2.18
+requests==2.32.1
+pillow==10.3.0
+tritonclient[all]==2.45.0
+gevent==22.10.2

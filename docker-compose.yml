@@ -1,0 +1,32 @@
+services:
+  triton:
+    image: nvcr.io/nvidia/tritonserver:22.04-py3
+    container_name: triton_server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./tmp/triton_repo:/models # MUST add "." before "/tmp"
+    networks:
+      - triton_network
+    command: ["tritonserver", "--model-repository=/models"]
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:8000/v2/health/live || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  inference:
+    image: triton_inference
+    container_name: triton_inference
+    volumes:
+      - ./results:/results # MUST add "." before "/results"
+    networks:
+      - triton_network
+    depends_on:
+      triton:
+        condition: service_healthy
+
+networks:
+  triton_network:
+    name: triton_network
